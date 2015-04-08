@@ -3,7 +3,6 @@ import os
 import re
 import requests
 import unittest
-from urlparse import urlparse
 import yaml
 
 from novaclient import client as testnovaclient 
@@ -11,7 +10,7 @@ from novaclient import exceptions
 from mock import patch
 
 
-def fake_request(self, url, method, inject_flag_file='./clientinject.dat', **kwargs):
+def fake_request(self, url, method, **kwargs):
     kwargs.setdefault('headers', kwargs.get('headers', {}))
     kwargs['headers']['User-Agent'] = self.USER_AGENT
     kwargs['headers']['Accept'] = 'application/json'
@@ -36,6 +35,7 @@ def fake_request(self, url, method, inject_flag_file='./clientinject.dat', **kwa
         **kwargs)
 
     # begin test patch
+    inject_flag_file='./clientinject.dat'
     if os.path.exists(inject_flag_file):
         # open, read and inject data
         replace_data=True
