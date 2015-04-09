@@ -53,7 +53,6 @@ def fake_request(method, url, **kwargs):
         replace_data=True
         with open(inject_flag_file) as infile:
             fake_response_data = yaml.load(infile)
-            print fake_response_data
         if fake_response_data['url']: # we want to re.match the given url
             replace_data=False # only replace on match
             if re.match(fake_response_data['url'], response.url):
