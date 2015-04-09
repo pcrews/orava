@@ -67,7 +67,7 @@ def fake_request(method, url, **kwargs):
             for key, value in vars(response).items():
                 print "%s: %s" %(key, value)
     # end test patch
-    print response
+
     return response
 
 
