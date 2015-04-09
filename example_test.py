@@ -8,31 +8,43 @@ import yaml
 from novaclient import client as testnovaclient 
 from novaclient import exceptions
 from mock import patch
+from requests.api import sessions
 
+def fake_request(method, url, **kwargs):
+    """Constructs and sends a :class:`Request <Request>`.
+    :param method: method for the new :class:`Request` object.
+    :param url: URL for the new :class:`Request` object.
+    :param params: (optional) Dictionary or bytes to be sent in the query string for the :class:`Request`.
+    :param data: (optional) Dictionary, bytes, or file-like object to send in the body of the :class:`Request`.
+    :param json: (optional) json data to send in the body of the :class:`Request`.
+    :param headers: (optional) Dictionary of HTTP Headers to send with the :class:`Request`.
+    :param cookies: (optional) Dict or CookieJar object to send with the :class:`Request`.
+    :param files: (optional) Dictionary of ``'name': file-like-objects`` (or ``{'name': ('filename', fileobj)}``) for multipart encoding upload.
+    :param auth: (optional) Auth tuple to enable Basic/Digest/Custom HTTP Auth.
+    :param timeout: (optional) How long to wait for the server to send data
+        before giving up, as a float, or a (`connect timeout, read timeout
+        <user/advanced.html#timeouts>`_) tuple.
+    :type timeout: float or tuple
+    :param allow_redirects: (optional) Boolean. Set to True if POST/PUT/DELETE redirect following is allowed.
+    :type allow_redirects: bool
+    :param proxies: (optional) Dictionary mapping protocol to the URL of the proxy.
+    :param verify: (optional) if ``True``, the SSL cert will be verified. A CA_BUNDLE path can also be provided.
+    :param stream: (optional) if ``False``, the response content will be immediately downloaded.
+    :param cert: (optional) if String, path to ssl client cert file (.pem). If Tuple, ('cert', 'key') pair.
+    :return: :class:`Response <Response>` object
+    :rtype: requests.Response
+    Usage::
+      >>> import requests
+      >>> req = requests.request('GET', 'http://httpbin.org/get')
+      <Response [200]>
+    """
 
-def fake_request(self, url, method, **kwargs):
-    kwargs.setdefault('headers', kwargs.get('headers', {}))
-    kwargs['headers']['User-Agent'] = self.USER_AGENT
-    kwargs['headers']['Accept'] = 'application/json'
-    if 'body' in kwargs:
-        kwargs['headers']['Content-Type'] = 'application/json'
-        kwargs['data'] = json.dumps(kwargs['body'])
-        del kwargs['body']
-    if self.timeout is not None:
-        kwargs.setdefault('timeout', self.timeout)
-    kwargs['verify'] = self.verify_cert
-
-    self.http_log_req(method, url, kwargs)
-
-    request_func = requests.request
-    session = self._get_session(url)
-    if session:
-        request_func = session.request
-
-    resp = request_func(
-        method,
-        url,
-        **kwargs)
+    session = sessions.Session()
+    response = session.request(method=method, url=url, **kwargs)
+    # By explicitly closing the session, we avoid leaving sockets open which
+    # can trigger a ResourceWarning in some cases, and look like a memory leak
+    # in others.
+    session.close()
 
     # begin test patch
     inject_flag_file='./clientinject.dat'
@@ -41,43 +53,24 @@ def fake_request(self, url, method, **kwargs):
         replace_data=True
         with open(inject_flag_file) as infile:
             fake_response_data = yaml.load(infile)
+            print fake_response_data
         if fake_response_data['url']: # we want to re.match the given url
             replace_data=False # only replace on match
-            if re.match(fake_response_data['url'], resp.url):
+            if re.match(fake_response_data['url'], response.url):
                 replace_data=True
         if replace_data:
             # replace resp[value] w/ the fake data
             print "Fake response data: %s" % fake_response_data
             for key, value in fake_response_data['data'].items():
-                setattr(resp, key, value)
+                setattr(response, key, value)
             print 'Altered response values:'
-            for key, value in vars(resp).items():
+            for key, value in vars(response).items():
                 print "%s: %s" %(key, value)
     # end test patch
+    print response
+    return response
 
-    self.http_log_resp(resp)
 
-    if resp.text:
-        # TODO(dtroyer): verify the note below in a requests context
-        # NOTE(alaski): Because force_exceptions_to_status_code=True
-        # httplib2 returns a connection refused event as a 400 response.
-        # To determine if it is a bad request or refused connection we need
-        # to check the body.  httplib2 tests check for 'Connection refused'
-        # or 'actively refused' in the body, so that's what we'll do.
-        if resp.status_code == 400:
-            if ('Connection refused' in resp.text or
-                    'actively refused' in resp.text):
-                raise exceptions.ConnectionRefused(resp.text)
-        try:
-            body = json.loads(resp.text)
-        except ValueError:
-            body = None
-    else:
-        body = None
-    if resp.status_code >= 400:
-        raise exceptions.from_response(resp, body, url, method)
-
-    return resp, body
 
 class ClientTestCase(unittest.TestCase):
     """Test case for the client methods."""
@@ -88,7 +81,7 @@ class ClientTestCase(unittest.TestCase):
         auth_url = os.environ['OS_AUTH_URL']
         project = os.environ['OS_TENANT_NAME']
         self.inject_file_path='./clientinject.dat'
-        self.patcher = patch('novaclient.client.HTTPClient.request', fake_request)
+        self.patcher = patch('requests.request', fake_request)
         self.patcher.start()
         self.client = testnovaclient.Client(2, user, pw, project, auth_url) 
 
