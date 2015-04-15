@@ -1,0 +1,88 @@
+flavor_list_test.ClientTestCase:
+        - description: 'basic test'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              data:
+                  greeting: 'hola!' 
+
+        - description: 'Test injected nonsense error'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail" 
+              exception: 'novaclient.exceptions.ClientException'
+              data:
+                  status_code: 90210
+                  _content:
+                    error:
+                      message: 'Old Gregg did not like you being in his waters!'
+                      detail: 'Mmmm...creamy.'
+
+        - description: 'Test 500 status code'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              exception: 'novaclient.exceptions.ClientException'
+              data:
+                  status_code: 500 
+                  _content:
+                    error:
+                      message: 'You just hit a faked 500!'
+
+        - description: 'Test 503 status code'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              exception: 'novaclient.exceptions.ClientException'
+              data:
+                  status_code: 503
+                  _content:
+                    error:
+                      message: 'You just hit a faked 503!'
+
+        - description: 'Test 400 status code'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              exception: 'novaclient.exceptions.ClientException'
+              data:
+                  status_code: 400
+                  _content:
+                    error:
+                      message: 'You just hit a faked 400!'
+
+        - description: 'Test 401 status code'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              exception: 'novaclient.exceptions.ClientException'
+              data:
+                  status_code: 401 
+                  _content:
+                    error:
+                      message: 'You just hit a faked 401!'
+
+        - description: 'Test 403 status code'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              exception: 'novaclient.exceptions.ClientException'
+              data:
+                  status_code: 403 
+                  _content:
+                    error:
+                      message: 'You just hit a faked 403!'
+
+        - description: 'Test 405 status code'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              exception: 'novaclient.exceptions.ClientException'
+              data:
+                  status_code: 405 
+                  _content:
+                    error:
+                      message: 'You just hit a faked 405!'
+
+        - description: 'Test 413 status code'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              exception: 'novaclient.exceptions.ClientException'
+              data:
+                  status_code: 413 
+                  _content:
+                    error:
+                      message: 'You just hit a faked 413!'
+
