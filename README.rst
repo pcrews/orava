@@ -18,3 +18,9 @@ We expect relevant credentials (openrc) to be set as env vars.
     python -m unittest example_test
 
 
+Running a test case with variants
+---------------------------------
+
+To run a more complex test case that supports variants
+::
+    python -m unittest example_test
