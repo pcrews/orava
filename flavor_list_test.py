@@ -38,9 +38,6 @@ class ClientTestCase(unittest.TestCase):
             try:
                 exp_module = __import__(exception_module_name, fromlist=[class_name])
                 self.exp_exception = getattr(exp_module, class_name)
-                print self.exp_exception
-                print type(self.exp_exception)
-                print '@'*80
             except Exception, e:
                 print Exception, e
 
