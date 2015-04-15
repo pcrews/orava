@@ -24,3 +24,6 @@ Running a test case with variants
 To run a more complex test case that supports variants
 ::
     python orava.py --map-file=test_maps/basic.yml 
+
+This command line will run 14 variations of a single test case, that is
+focused on nova.flavor_list.
