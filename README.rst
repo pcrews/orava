@@ -23,4 +23,4 @@ Running a test case with variants
 
 To run a more complex test case that supports variants
 ::
-    python -m unittest example_test
+    python orava.py --map-file=test_maps/basic.yml 
