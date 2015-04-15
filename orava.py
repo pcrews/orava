@@ -20,10 +20,15 @@ def get_parser():
                        default=0,
                        help='Controls internal output.  Utilize multiple times to increase output'
                        )
+    parser.add_argument('--map-dir',
+                       dest='map_dir',
+                       default='test_maps',
+                       help='Directory containing the test map.'
+                       )
     parser.add_argument('--map-file',
                        dest='map_file',
-                       default='nova_base.dat',
-                       help='Module containing test inputs.  Assumed to be in the config directory'
+                       default='basic.yml',
+                       help='YAML file listing test variants to run.  Assumed in map-dir.'
                        )
     parser.add_argument('--os_username',
                        action='store',
@@ -57,7 +62,6 @@ def get_parser():
 #######
 parser = get_parser()
 args = parser.parse_args(sys.argv[1:])
-print args, '<<<<<<<<<<<'
 if args.verbose:
     logging.info("VERBOSE: argument values:")
     for key, item in vars(args).items():

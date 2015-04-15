@@ -5,6 +5,36 @@ flavor_list_test.ClientTestCase:
               data:
                   greeting: 'hola!' 
 
+        - description: 'basic test'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              data:
+                  status_code: 203
+
+        - description: 'basic test'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              data:
+                  status_code: 100
+
+        - description: 'basic test'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              data:
+                  status_code: 101
+
+        - description: 'basic test'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              data:
+                  status_code: 202
+
+        - description: 'basic test'
+          test_data:
+              url: "http://.*:8774/.*/flavors/detail"
+              data:
+                  status_code: 204
+
         - description: 'Test injected nonsense error'
           test_data:
               url: "http://.*:8774/.*/flavors/detail" 

@@ -13,7 +13,7 @@ def load_test_suite(args, map_file, logging):
     testloader = unittest.TestLoader()
     suite = unittest.TestSuite()
 
-    map_dir = 'test_maps'
+    map_dir = args.map_dir
 
     # get our test input variants (nodes, names, etc)
     # assuming all such files live in map_dir

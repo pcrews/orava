@@ -70,8 +70,8 @@ class ClientTestCase(unittest.TestCase):
 
 
     def test_request(self):
-        """Test a simple request."""
-        print ''
+        """Test a simple request.\n"""
+        print self.test_description
         response = ''
         cm = None
 
